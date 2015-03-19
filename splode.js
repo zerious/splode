@@ -24,7 +24,7 @@ splode._exceptionCount = 0;
 /**
  * Delay for a second before making the process exit (so it can log errors).
  */
-splode._exitDelay = 1e3;
+splode.exitDelay = 1e3;
 
 /**
  * Allow users to listen for uncaught exceptions.
@@ -43,21 +43,21 @@ splode.recover = function () {
 /**
  * Log to the console by default.
  */
-splode._logger = console;
+splode.log = console;
 
 /**
- * Set a custom logger.
+ * Set a custom log.
  */
-splode.setLogger = function (logger) {
-  if (typeof logger.error != 'function') {
-    process.emit('uncaughtException', new Error("Splode logger must have an error method."));
+splode.setLog = function (log) {
+  if (typeof log.error != 'function') {
+    process.emit('uncaughtException', new Error("Splode log must have an error method."));
     return;
   }
-  if (typeof logger.warn != 'function') {
-    process.emit('uncaughtException', new Error("Splode logger must have a warn method."));
+  if (typeof log.warn != 'function') {
+    process.emit('uncaughtException', new Error("Splode log must have a warn method."));
     return;
   }
-  splode._logger = logger;
+  splode.log = log;
 };
 
 /**
@@ -73,11 +73,11 @@ process.on('uncaughtException', function SPLODE_LISTENER(error) {
     });
   }
   catch (e) {
-    splode._logger.error('Splode detected an error in an error handler.');
+    splode.log.error('Splode detected an error in an error handler.');
     splode._isRecoverable = true;
   }
   if (splode._isRecoverable) {
-    splode._logger.warn(error);
+    splode.log.warn(error);
   }
   else {
     if (!error) {
@@ -88,8 +88,18 @@ process.on('uncaughtException', function SPLODE_LISTENER(error) {
         error = e;
       }
     }
-    splode._logger.error('[Splode] ' + (error.stack || error));
-    setTimeout(process.exit, splode._exitDelay);
+    splode.log.error('[Splode] ' + (error.stack || error));
+
+    // Allow health checks to fail while we're waiting to exit.
+    process._isShuttingDown = true;
+
+    // Remove listeners to prevent the process from failing to exit.
+    process.removeAllListeners('beforeExit');
+    process.removeAllListeners('exit');
+    process.removeAllListeners('uncaughtException');
+
+    // Delay exiting, allowing the process to shut down gracefully.
+    setTimeout(process.exit, splode.exitDelay);
   }
   delete splode._isRecoverable;
 });

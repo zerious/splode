@@ -57,9 +57,13 @@ occurs.
 Tells Splode you are recovering from the error. Otherwise, Splode will call
 `process.exit()`.
 
-#### splode.setLogger(Object logger)
-Sets a custom logger for Splode to use. Splode uses `console` by default.
-A custom logger must expose `logger.error(err)`.
+#### splode.setLog(Object log)
+Sets a custom log for Splode to use. Splode uses `console` by default.
+A custom log must expose `log.error(err)`.
+
+#### Integer splode.exitDelay
+Exit delay is the number of milliseconds to wait before calling
+`process.exit()`. A delay allows logs to finish before exiting.
 
 
 ## The Future

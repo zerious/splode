@@ -10,20 +10,20 @@ process.exit = function () {
 
 var splodeListener;
 var otherListeners = [];
-var blackHoleLogger = {
+var blackHoleLog = {
   error: function () {},
   warn: function () {},
   IS_BLACK_HOLE: true
 };
-var AppendLogger = function () {
-  var logger = this;
-  logger.ERR = [];
-  logger.error = function (message) {
-    logger.ERR.push(message);
+var AppendLog = function () {
+  var log = this;
+  log.ERR = [];
+  log.error = function (message) {
+    log.ERR.push(message);
   },
-  logger.WRN = [];
-  logger.warn = function (message) {
-    logger.WRN.push(message);
+  log.WRN = [];
+  log.warn = function (message) {
+    log.WRN.push(message);
   }
 };
 
@@ -44,35 +44,35 @@ function listenUniquely() {
 
 describe('splode', function () {
 
-  describe('.setLogger', function () {
+  describe('.setLog', function () {
 
-      it('should be a function', function () {
-        is(typeof splode.setLogger, 'function');
-      });
+    it('should be a function', function () {
+      is(typeof splode.setLog, 'function');
+    });
 
-      it('should set a logger', function () {
-          splode.setLogger(new AppendLogger());
-          is(splode._logger.ERR.length, 0);
-      });
+    it('should set a log', function () {
+      splode.setLog(new AppendLog());
+      is(splode.log.ERR.length, 0);
+    });
 
-      it('should require .error and .warn', function () {
-        listenUniquely();
-        var logger = splode._logger;
-        splode.setLogger(blackHoleLogger);
-        splode.listen(function (err) {
-          if (/Splode logger/.test(err.message)) {
-            splode.recover();
-          }
-        });
-        var doNothing = function() {};
-        splode.setLogger({});
-        splode.setLogger({warn: doNothing});
-        splode.setLogger({error: doNothing});
-        splode.setLogger({error: 1, warn: doNothing});
-        splode.setLogger({error: doNothing, warn: 1});
-        is(splode._logger.IS_BLACK_HOLE, true);
-        splode.setLogger(logger);
+    it('should require .error and .warn', function () {
+      listenUniquely();
+      var log = splode.log;
+      splode.setLog(blackHoleLog);
+      splode.listen(function (err) {
+        if (/Splode log/.test(err.message)) {
+          splode.recover();
+        }
       });
+      var doNothing = function() {};
+      splode.setLog({});
+      splode.setLog({warn: doNothing});
+      splode.setLog({error: doNothing});
+      splode.setLog({error: 1, warn: doNothing});
+      splode.setLog({error: doNothing, warn: 1});
+      is(splode.log.IS_BLACK_HOLE, true);
+      splode.setLog(log);
+    });
 
   });
 
@@ -84,7 +84,7 @@ describe('splode', function () {
 
     it('should listen for errors', function (done) {
       listenUniquely();
-      splode._exitDelay = 5;
+      splode.exitDelay = 5;
       exits = 0;
       splode.listen(function (err) {
         setTimeout(function () {
