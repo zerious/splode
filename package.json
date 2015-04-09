@@ -1,6 +1,6 @@
 {
   "name": "splode",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "A Node.js uncaught exception handler",
   "dependencies": {},
   "devDependencies": {
